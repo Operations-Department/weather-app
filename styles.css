@@ -8,17 +8,114 @@
 	vertical-align: baseline;
 }
 
-.background {
+html {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+.main {
     height: 100vh;
     width: 100%;
     box-sizing: border-box;
+    display: grid;
+    grid-template-rows: 2fr 1fr 1fr;
+    /* border: solid 1px blue; */
+    gap: 8px;
+    padding: 8px;
 }
 
-.normal {
+.background {
     background-attachment: fixed;
     background-position: 100% 100%;
 }
 
-.normal {
-    background: url(./imgs/background.jpg);
+.background {
+    background: url(./imgs/background-2.jpg);
+}
+
+.top-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.top-section > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 0rem 3rem 0rem 3rem;
+}
+
+.top-section div:first-child {
+    align-content: flex-start;
+}
+
+.top-section div:last-child {
+    align-items: flex-end;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+#searchbox {
+    outline: none;
+    height: 50px;
+    width: 230px;
+    background: none;
+    color: white;
+    border-bottom: 3px solid white;
+    font-size: 1.5rem;
+}
+
+#searchbox::placeholder {
+    color: white;
+    size: 13rem;
+}
+
+.tile {
+    background: rgba(0, 0, 0, 0.218);
+    border-radius: 8px;
+}
+
+.middle-section > div.tile,
+.bottom-section > div.tile {
+    height: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.daily-forecast-tile {
+    display: flex;
+}
+
+.daily-tile-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.sub-tile {
+    background: rgba(0, 0, 0, 0.218);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 13rem;
+}
+
+.hourly-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 13px;
+    padding: 0rem 3rem 0rem 3rem;
 }
