@@ -11,12 +11,17 @@
     <div class="main background">
         <div class="top-section">
             <div class="tile">
-                <input type="text" id="searchbox" placeholder="Search Here...">
-                <h1>city, region, country</h1>
-                <h3>date and time</h3>
-                <h1>weather and temp</h1>
+                <input type="text" id="searchbox" placeholder="Enter Location...">
+                <h1 id="area">city, region, country</h1>
+                <h3 id="time">date and time</h3>
             </div>
-            <div class="tile"></div>
+            <div class="tile">
+                <h1 id="condition">weather</h1>
+                <div id="condition-icon-container">
+                    <img src="#" alt="condition-icon" id="condition-icon">
+                </div>
+                <h1 id="temp">temperature</h1>
+            </div>
             <div class="tile">
                 <h2>high/low</h2>
                 <h2>feels like</h2>
@@ -28,7 +33,7 @@
         <div class="middle-section">
             <div class="tile daily-forecast-tile">
                 <div class="title-container">
-                    <h3>3 Day Forecast</h3>
+                    <h3>3-Day Forecast</h3>
                 </div>
                 <div class="daily-tile-container">
                     <div class="sub-tile">
@@ -53,7 +58,7 @@
         <div class="bottom-section">
             <div class="tile hourly-forecast-tile">
                 <div class="title-container">
-                    <h3>Hourly</h3>
+                    <h3>Hourly-Forecast</h3>
                 </div>
                 <div class="hourly-container">
                     <div class="sub-tile">
