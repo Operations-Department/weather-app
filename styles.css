@@ -64,6 +64,10 @@ html {
     align-content: flex-start;
 }
 
+.top-section div:nth-child(2) {
+    align-items: center;
+}
+
 .top-section div:last-child {
     align-items: flex-end;
 }
@@ -98,11 +102,15 @@ h3 {
 #condition-icon-container {
     display: flex;
     justify-content: center;
+    height: 30%;
+    width: 100%;
+    align-items: flex-end;
 }
 
 img#condition-icon {
     height: 100%;
-    width: 50%;
+    width: auto;
+    /* transform: scale(1.5); */
 }
 
 .tile {
@@ -129,6 +137,7 @@ img#condition-icon {
 
 .sub-tile {
     /* background: rgba(0, 0, 0, 0.218); */
+    border: 2px dotted red;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
