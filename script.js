@@ -4,13 +4,15 @@ const time = document.getElementById('time');
 const condition = document.getElementById('condition');
 const conditionIconElement = document.getElementById('condition-icon');
 const temp = document.getElementById('temp');
+const dayHigh = document.getElementById('day-high');
+const dayLow = document.getElementById('day-low');
 const uv = document.getElementById('uv');
 const feels = document.getElementById('feels');
 const precip = document.getElementById('precip');
 const humid = document.getElementById('humid');
 const wind = document.getElementById('wind');
 const dailyForecastContainer = document.querySelector('.daily-tile-container');
-const hourlyForecastContainer = document.querySelector('.hourly-forecast-tile');
+const hourlyForecastContainer = document.querySelector('.hourly-container');
 
 async function getWeather(country) {
     try {
@@ -24,6 +26,15 @@ async function getWeather(country) {
         return null;
     }
 };
+
+window.onload = getWeather('Vancouver').then(updateDOM);
+
+searchbox.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        let searchedCountry = searchbox.value;
+        getWeather(searchedCountry).then(updateDOM);
+    }
+});
 
 function getDay() {
     const week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -44,7 +55,7 @@ function updateDOM(data) {
 
     if (data) {
 
-        //top section
+        // top section - current weather info
 
         const city = data.location.name;
         const region = data.location.region;
@@ -54,11 +65,13 @@ function updateDOM(data) {
 
         const conditionText = data.current.condition.text;
         const conditionIcon = data.current.condition.icon;
-
         const tempF = data.current.temp_f;
         const tempC = data.current.temp_c;
+        const maxTempF = data.forecast.forecastday[0].day.maxtemp_f;
+        const maxTempC = data.forecast.forecastday[0].day.maxtemp_c;
+        const minTempF = data.forecast.forecastday[0].day.mintemp_f;
+        const minTempC = data.forecast.forecastday[0].day.mintemp_c;
 
-        const uvIndex = data.current.uv;
         const feelsLikeC = data.current.feelslike_c;
         const feelsLikeF = data.current.feelslike_f;
         const precipitationIN = data.current.precip_in;
@@ -66,69 +79,112 @@ function updateDOM(data) {
         const humidity = data.current.humidity;
         const windSpeedKPH = data.current.wind_kph;
         const windSpeedMPH = data.current.wind_mph;
-
+        const uvIndex = data.current.uv;
 
         area.textContent = `${city}, ${region}, ${country}`;
         time.textContent = `${today}, ${localtime}`;
 
         condition.textContent = conditionText;
         conditionIconElement.src = `https:${conditionIcon}`;
-        temp.textContent = `${tempF}°F / ${tempC}°C`;
+        temp.textContent = `Now: ${tempF}°f / ${tempC}°c`;
+        dayHigh.textContent = `High: ${maxTempF}°f/ ${maxTempC}°c`;
+        dayLow.textContent = `Low: ${minTempF}°f / ${minTempC}°c`;
 
-        uv.textContent = `UV Index:\n${uvIndex}`;
-        feels.textContent = `Feels Like:\n${feelsLikeF}°F / ${feelsLikeC}°C`;   
+        feels.textContent = `Feels Like:\n${feelsLikeF}°f / ${feelsLikeC}°c`;   
         precip.textContent = `Precipitation:\n${precipitationIN}in. / ${precipitationMM}mm.`;  
         humid.textContent = `Humidity:\n${humidity}%`;   
-        wind.textContent = `Windspeed:\n${windSpeedMPH}mph / ${windSpeedKPH}kph`;    
+        wind.textContent = `Wind Speed:\n${windSpeedMPH}mph / ${windSpeedKPH}kph`;    
+        uv.textContent = `UV Index:\n${uvIndex}`;
 
-        //mid-section
+        //mid-section - daily forecast info
 
         const threeDayForecast = data.forecast.forecastday;
 
-        threeDayForecast.forEach(element => {
-            let dayForecastDate = element.date;
-            let dayForecastImageURL = element.day.condition.icon;
-            let dayAverageTempC = element.day.avgtemp_c;
-            let dayAverageTempF = element.day.avgtemp_f;
+        dailyForecastContainer.textContent = '';
 
-            let dayForecastIcon = `https:${dayForecastImageURL}`;
+        update3DayForecastDOM(threeDayForecast);
 
-            const subTileDiv = document.createElement('div');
-            subTileDiv.classList.add('sub-tile');
-            dailyForecastContainer.appendChild(subTileDiv);
+        //bottom section - hourly forecast info
 
-            const subTileHeader = document.createElement('h3');
-            subTileHeader.textContent = dayForecastDate;
-            subTileDiv.appendChild(subTileHeader);
+        const hourlyForecastToday = data.forecast.forecastday[0].hour;
+        const hourlyForecastTomorrow = data.forecast.forecastday[1].hour;
+        const hourlyForecastLast = data.forecast.forecastday[2].hour;
 
-            const subTileImageContainer = document.createElement('div');
-            subTileImageContainer.classList.add('forecast-icon-container');
-            const subTileImage = document.createElement('img');
-            subTileImage.alt = 'weather-icon';
-            subTileImage.src = dayForecastIcon;
-            subTileDiv.appendChild(subTileImageContainer);
-            subTileImageContainer.appendChild(subTileImage);
+        hourlyForecastContainer.textContent = '';
 
-            const subTileFooter = document.createElement('h3');
-            subTileFooter.textContent = `${dayAverageTempF}°F / ${dayAverageTempC}°C`;
-            subTileDiv.appendChild(subTileFooter);
-        });
+        udpateHourlyForecastDOM(hourlyForecastToday);
 
-        //bottom section 
-
-        const hourlyForecast
-
+        return { hourlyForecastToday, hourlyForecastTomorrow, hourlyForecastLast }
 
     } else {
         alert('No data available');
     }
 }
 
-window.onload = getWeather('Vancouver').then(updateDOM);
+function update3DayForecastDOM (array) {
 
-searchbox.addEventListener('keyup', (event) => {
-    if (event.key === 'Enter') {
-        let searchedCountry = searchbox.value;
-        getWeather(searchedCountry).then(updateDOM);
-    }
-});
+    let classCounter = 0;
+
+    return array.forEach(element => {
+        let dayForecastDate = element.date;
+        let dayForecastImageURL = element.day.condition.icon;
+        let dayAverageTempC = element.day.avgtemp_c;
+        let dayAverageTempF = element.day.avgtemp_f;
+
+        let dayForecastIcon = `https:${dayForecastImageURL}`;
+
+        const subTileDiv = document.createElement('div');
+        subTileDiv.classList.add('sub-tile');
+        dailyForecastContainer.appendChild(subTileDiv);
+        subTileDiv.classList.add(`forecast-day-${classCounter}`);
+        
+        classCounter++;
+
+        const subTileHeader = document.createElement('h3');
+        subTileHeader.textContent = dayForecastDate;
+        subTileDiv.appendChild(subTileHeader);
+
+        const subTileImageContainer = document.createElement('div');
+        subTileImageContainer.classList.add('forecast-icon-container');
+        const subTileImage = document.createElement('img');
+        subTileImage.alt = 'weather-icon';
+        subTileImage.src = dayForecastIcon;
+        subTileDiv.appendChild(subTileImageContainer);
+        subTileImageContainer.appendChild(subTileImage);
+
+        const subTileFooter = document.createElement('h3');
+        subTileFooter.textContent = `${dayAverageTempF}°f / ${dayAverageTempC}°c`;
+        subTileDiv.appendChild(subTileFooter);
+    });
+};
+
+function udpateHourlyForecastDOM(array) {      
+    return array.forEach((element) => {
+        let [date, hour] = element.time.split(' ');
+        let tempF = element.temp_f;
+        let tempC = element.temp_c;
+        let iconURL = element.condition.icon;
+        let icon = `https:${iconURL}`;
+
+        const subTileDiv = document.createElement('div');
+        subTileDiv.classList.add('sub-tile');
+        hourlyForecastContainer.appendChild(subTileDiv); 
+
+        const subTileHeader = document.createElement('h3');
+        subTileHeader.textContent = hour;
+        subTileDiv.appendChild(subTileHeader);
+
+        const subTileBody = document.createElement('h3');
+        subTileBody.textContent = `${tempF}°f / ${tempC}°c`;
+        subTileDiv.appendChild(subTileBody);
+
+        const subTileImageContainer = document.createElement('div');
+        subTileImageContainer.classList.add('forecast-icon-container');
+        const subTileImage = document.createElement('img');
+        subTileImage.alt = 'weather-icon';
+        subTileImage.src = icon;
+        subTileDiv.appendChild(subTileImageContainer);
+        subTileImageContainer.appendChild(subTileImage);
+    });
+};
+

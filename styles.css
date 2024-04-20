@@ -136,8 +136,8 @@ img#condition-icon {
 }
 
 .sub-tile {
-    /* background: rgba(0, 0, 0, 0.218); */
-    border: 2px dotted red;
+    background: rgba(0, 0, 0, 0.53);
+    /* border: 2px dotted red; */
     border-radius: 8px;
     display: flex;
     flex-direction: column;
