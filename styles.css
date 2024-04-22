@@ -55,7 +55,7 @@ html {
 .top-section > * {
     display: flex;
     flex-direction: column;
-    padding: 0rem 3rem 0rem 3rem;
+    padding: 2.5rem;
     gap: 2rem;
     justify-content: center;
 }
@@ -129,6 +129,21 @@ img#condition-icon {
     display: flex;
 }
 
+.forecast-day {
+    /* transition: ease-in-out 200ms; */
+    color: white;
+}
+
+.forecast-day:hover {
+    cursor: pointer;
+    background: white;
+    color: black;
+}
+
+.forecast-day:active {
+    transform: scale(0.95);
+}
+
 .daily-tile-container {
     width: 100%;
     display: flex;
@@ -143,7 +158,8 @@ img#condition-icon {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 13rem;
+    width: 11rem;
+    gap: 8px;
 }
 
 .title-container {
@@ -153,12 +169,18 @@ img#condition-icon {
 .hourly-forecast-tile {
     display: flex;
     align-items: center;
+    gap: 4rem;
 }
 
 .hourly-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 13px;
-    padding: 0rem 3rem 0rem 3rem;
-    width: 100%;
+    /* display: grid; */
+    /* grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    padding: 0rem;
+    width: 80vw;
+    overflow-x: scroll;
+    white-space: nowrap;
 }

@@ -14,12 +14,16 @@ const wind = document.getElementById('wind');
 const dailyForecastContainer = document.querySelector('.daily-tile-container');
 const hourlyForecastContainer = document.querySelector('.hourly-container');
 
+
+let weatherData;
+
 async function getWeather(country) {
     try {
         const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=b04164c4e2604ea99d424433241104&q=` 
         + country + `&days=3&aqi=yes&alerts=no`, {mode: 'cors'});
         const data = await response.json();
         console.log(data);
+        weatherData = data;
         return data;
     } catch (error) {
         alert('Something terrible happened here', error);
@@ -44,14 +48,13 @@ function getDay() {
     const today = week[currentDay];
     const tomorrow = week[(currentDay + 1) % 7];
     const nextDay = week[(currentDay + 2) % 7]
-    const lastDay = week[(currentDay + 3) % 7]
 
-    return { today, tomorrow, nextDay, lastDay };
+    return { today, tomorrow, nextDay };
 }
 
 function updateDOM(data) {
 
-    const { today, tomorrow, nextDay, lastDay } = getDay();
+    const { today } = getDay();
 
     if (data) {
 
@@ -81,13 +84,16 @@ function updateDOM(data) {
         const windSpeedMPH = data.current.wind_mph;
         const uvIndex = data.current.uv;
 
+        const [date, hour] = localtime.split(' ');
+        const [year, month, day] = date.split('-');
+
         area.textContent = `${city}, ${region}, ${country}`;
-        time.textContent = `${today}, ${localtime}`;
+        time.textContent = `${today}, ${month}-${day}-${year}, ${hour}`;
 
         condition.textContent = conditionText;
         conditionIconElement.src = `https:${conditionIcon}`;
         temp.textContent = `Now: ${tempF}°f / ${tempC}°c`;
-        dayHigh.textContent = `High: ${maxTempF}°f/ ${maxTempC}°c`;
+        dayHigh.textContent = `High: ${maxTempF}°f / ${maxTempC}°c`;
         dayLow.textContent = `Low: ${minTempF}°f / ${minTempC}°c`;
 
         feels.textContent = `Feels Like:\n${feelsLikeF}°f / ${feelsLikeC}°c`;   
@@ -100,21 +106,13 @@ function updateDOM(data) {
 
         const threeDayForecast = data.forecast.forecastday;
 
-        dailyForecastContainer.textContent = '';
-
         update3DayForecastDOM(threeDayForecast);
 
         //bottom section - hourly forecast info
 
         const hourlyForecastToday = data.forecast.forecastday[0].hour;
-        const hourlyForecastTomorrow = data.forecast.forecastday[1].hour;
-        const hourlyForecastLast = data.forecast.forecastday[2].hour;
-
-        hourlyForecastContainer.textContent = '';
 
         udpateHourlyForecastDOM(hourlyForecastToday);
-
-        return { hourlyForecastToday, hourlyForecastTomorrow, hourlyForecastLast }
 
     } else {
         alert('No data available');
@@ -123,20 +121,31 @@ function updateDOM(data) {
 
 function update3DayForecastDOM (array) {
 
+    dailyForecastContainer.textContent = '';
+
+    const { tomorrow, nextDay } = getDay();
+
     let classCounter = 0;
 
     return array.forEach(element => {
-        let dayForecastDate = element.date;
+
+        let dayForecastDate;
+
+        if (classCounter === 0) dayForecastDate = 'Today';
+        if (classCounter === 1) dayForecastDate = tomorrow;
+        if (classCounter === 2) dayForecastDate = nextDay;
+
         let dayForecastImageURL = element.day.condition.icon;
         let dayAverageTempC = element.day.avgtemp_c;
         let dayAverageTempF = element.day.avgtemp_f;
 
         let dayForecastIcon = `https:${dayForecastImageURL}`;
 
-        const subTileDiv = document.createElement('div');
+        const subTileDiv = document.createElement('button');
         subTileDiv.classList.add('sub-tile');
         dailyForecastContainer.appendChild(subTileDiv);
-        subTileDiv.classList.add(`forecast-day-${classCounter}`);
+        subTileDiv.classList.add(`forecast-day`);
+        subTileDiv.classList.add(`day-${classCounter}`);
         
         classCounter++;
 
@@ -159,6 +168,9 @@ function update3DayForecastDOM (array) {
 };
 
 function udpateHourlyForecastDOM(array) {      
+
+    hourlyForecastContainer.textContent = '';
+
     return array.forEach((element) => {
         let [date, hour] = element.time.split(' ');
         let tempF = element.temp_f;
@@ -188,3 +200,17 @@ function udpateHourlyForecastDOM(array) {
     });
 };
 
+dailyForecastContainer.addEventListener('click', (e) => {
+
+    const hourlyForecastToday = weatherData.forecast.forecastday[0].hour;
+    const hourlyForecastTomorrow = weatherData.forecast.forecastday[1].hour;
+    const hourlyForecastLast = weatherData.forecast.forecastday[2].hour;
+
+    if (e.target.closest('.forecast-day')) {
+        
+        if (e.target.closest('.day-0')) udpateHourlyForecastDOM(hourlyForecastToday);
+        if (e.target.closest('.day-1')) udpateHourlyForecastDOM(hourlyForecastTomorrow);
+        if (e.target.closest('.day-2')) udpateHourlyForecastDOM(hourlyForecastLast);
+        return;
+    }
+});
