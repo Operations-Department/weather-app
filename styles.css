@@ -72,6 +72,37 @@ html {
     align-items: flex-end;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
+button.degrees {
+    height: 1.5rem;
+    width: 3rem;
+    border-radius: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.button-before-click {
+    justify-content: flex-end;
+    background: #5a56ff;
+}
+
+.button-after-click {
+    justify-content: flex-start;
+    background: #e58a8a;
+}
+
+div.button-switch {
+    background: white;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 60px;
+    width: 20px;
+    height: 20px;
+}
+
 h1 {
     font-size: 2.5rem;
 }
@@ -113,6 +144,10 @@ img#condition-icon {
     /* transform: scale(1.5); */
 }
 
+img {
+    width: 5rem;
+}
+
 .tile {
     background: rgb(0 0 0 / 44%);
     border-radius: 8px;
@@ -135,7 +170,6 @@ img#condition-icon {
 }
 
 .forecast-day:hover {
-    cursor: pointer;
     background: white;
     color: black;
 }
@@ -159,7 +193,7 @@ img#condition-icon {
     align-items: center;
     justify-content: space-between;
     width: 11rem;
-    gap: 8px;
+    gap: 14px;
 }
 
 .title-container {
@@ -169,7 +203,7 @@ img#condition-icon {
 .hourly-forecast-tile {
     display: flex;
     align-items: center;
-    gap: 4rem;
+    gap: 2rem;
 }
 
 .hourly-container {

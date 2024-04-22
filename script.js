@@ -1,4 +1,4 @@
-const searchbox = document.getElementById('searchbox');
+const searchBox = document.getElementById('searchbox');
 const area = document.getElementById('area');
 const time = document.getElementById('time');
 const condition = document.getElementById('condition');
@@ -13,16 +13,19 @@ const humid = document.getElementById('humid');
 const wind = document.getElementById('wind');
 const dailyForecastContainer = document.querySelector('.daily-tile-container');
 const hourlyForecastContainer = document.querySelector('.hourly-container');
+const degreeButton = document.querySelector('.degrees');
+const buttonSwitch = document.querySelector('.button-switch');
 
 
 let weatherData;
+
+let degreeFahrenheit = true;
 
 async function getWeather(country) {
     try {
         const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=b04164c4e2604ea99d424433241104&q=` 
         + country + `&days=3&aqi=yes&alerts=no`, {mode: 'cors'});
         const data = await response.json();
-        console.log(data);
         weatherData = data;
         return data;
     } catch (error) {
@@ -33,9 +36,27 @@ async function getWeather(country) {
 
 window.onload = getWeather('Vancouver').then(updateDOM);
 
-searchbox.addEventListener('keyup', (event) => {
+degreeButton.addEventListener('click', function() {
+    buttonSwitch.textContent = '';
+
+    if (degreeButton.classList.contains('button-before-click')) {
+        degreeButton.classList.remove('button-before-click');
+        degreeButton.classList.add('button-after-click');
+        buttonSwitch.textContent = '°c';
+        degreeFahrenheit = false;
+        updateDOM(weatherData);
+    } else {
+        degreeButton.classList.remove('button-after-click');
+        degreeButton.classList.add('button-before-click');
+        buttonSwitch.textContent = '°f';
+        degreeFahrenheit = true;
+        updateDOM(weatherData);
+    }
+});
+
+searchBox.addEventListener('keyup', (event) => {
     if (event.key === 'Enter') {
-        let searchedCountry = searchbox.value;
+        let searchedCountry = searchBox.value;
         getWeather(searchedCountry).then(updateDOM);
     }
 });
@@ -92,11 +113,22 @@ function updateDOM(data) {
 
         condition.textContent = conditionText;
         conditionIconElement.src = `https:${conditionIcon}`;
-        temp.textContent = `Now: ${tempF}°f / ${tempC}°c`;
-        dayHigh.textContent = `High: ${maxTempF}°f / ${maxTempC}°c`;
-        dayLow.textContent = `Low: ${minTempF}°f / ${minTempC}°c`;
 
-        feels.textContent = `Feels Like:\n${feelsLikeF}°f / ${feelsLikeC}°c`;   
+        if (degreeFahrenheit) {
+            temp.textContent = `Now: ${tempF}°f`;
+            dayHigh.textContent = `High: ${maxTempF}°f`;
+            dayLow.textContent = `Low: ${minTempF}°f`;
+            feels.textContent = `Feels Like: ${feelsLikeF}°f`;   
+        }; 
+
+        if (!degreeFahrenheit) {
+            temp.textContent = `Now: ${tempC}°c`;
+            dayHigh.textContent = `High: ${maxTempC}°c`;
+            dayLow.textContent = `Low: ${minTempC}°c`;
+            feels.textContent = `Feels Like: ${feelsLikeC}°c`;   
+
+        };
+
         precip.textContent = `Precipitation:\n${precipitationIN}in. / ${precipitationMM}mm.`;  
         humid.textContent = `Humidity:\n${humidity}%`;   
         wind.textContent = `Wind Speed:\n${windSpeedMPH}mph / ${windSpeedKPH}kph`;    
@@ -162,7 +194,10 @@ function update3DayForecastDOM (array) {
         subTileImageContainer.appendChild(subTileImage);
 
         const subTileFooter = document.createElement('h3');
-        subTileFooter.textContent = `${dayAverageTempF}°f / ${dayAverageTempC}°c`;
+
+        if (degreeFahrenheit) subTileFooter.textContent = `${dayAverageTempF}°f`;
+        if (!degreeFahrenheit) subTileFooter.textContent = `${dayAverageTempC}°c`;
+        
         subTileDiv.appendChild(subTileFooter);
     });
 };
@@ -187,7 +222,10 @@ function udpateHourlyForecastDOM(array) {
         subTileDiv.appendChild(subTileHeader);
 
         const subTileBody = document.createElement('h3');
-        subTileBody.textContent = `${tempF}°f / ${tempC}°c`;
+
+        if (degreeFahrenheit) subTileBody.textContent = `${tempF}°f`;
+        if (!degreeFahrenheit) subTileBody.textContent = `${tempC}°c`;
+
         subTileDiv.appendChild(subTileBody);
 
         const subTileImageContainer = document.createElement('div');
